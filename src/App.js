@@ -8,13 +8,15 @@ import { useState } from 'react';
 //메인 페이지! 
 function App() {
   const post = '우동 맛집';
+
+  // # useState 함수 특징
   //자료 잠깐 저장하고, 사용하려면 [a,b] 변수 지정해야함!
   //useState('보관할 자료') = 'a' 를 의미;
   // [a,b] => b는 state를 변경해주는 함수! (변경 함수_ 써야지 state가 자동 랜더링잘됨.) 
   // state 는 자동랜더링 됨! (html에 자동으로 데이터랜더링 굳이 수정 안될때 ! )
   // 자주 변경될 데이터는 state로 빼서 저장하기.
-  // state 변경값 사용하려면!!! 변경 함수 써야함! 
-
+  // state 변경값 사용하려면!!! 변경 함수 써야함! _ Q) 변경하기 위한 도구인가..? 
+  // state 변경함수는 늦게 처리 되기 때문에 비동기형식으로 써줘야함!!!!
 
 
   //state 변경함수의 특징 
@@ -34,6 +36,7 @@ function App() {
   let [따봉, 따봉변경] = useState([0,0,0]);
   const [modal,SetModal]  = useState(false); // 스위치 역할임.
   const [title,SetTitle]= useState(0);
+  const [입력값,입력값변경] =useState('');
 
   // # map 함수 사용 법
   // 1. array 자료 갯수만큼 함수 안의 코드 실행해줌.
@@ -85,13 +88,26 @@ function App() {
             return (
             <div className='list'>
              <h4 onClick={()=>{SetModal(true); SetTitle(i)}}>{글제목[i]}
-            <span onClick={()=>{
+            <span onClick={(e)=>{e.stopPropagation() // 상위요소로 이벤트 진행되지 않음(왜적냐? 위에 span태그때문에 모달창이 따봉 버튼 클릭해도 뜸, _ 원래 뜨면 안됨. 그걸 방지하고자 사용함.)
                 const copy = [...따봉]; // array 자료일때, 복사부터 하기
-                copy[i]+=1;
+                copy[i]+=1; // 한개씩 증가
                 따봉변경(copy)}}>❤️
-            </span>{따봉[i]}
+            </span>{따봉[i]} 
+
+
+            {/* Q ) 삭제 버튼 누르면 글 삭제 되기. */}
+            <button onClick={()=>{
+             const copy2 = [...글제목];
+             
+             //원하는 자료 삭제 (i가 인덱스를 의미)
+             copy2.splice(i,1);
+             글제목변경(copy2);
+            }}>삭제</button>
+
+
              </h4>
             <p> 7월 9일 발행 </p>
+
           </div>)
           })
         }
@@ -123,6 +139,28 @@ function App() {
     <button onClick={()=>{SetTitle(0)}}>글제목0</button>
     <button onClick={()=>{SetTitle(1)}}>글제목1</button>
     <button onClick={()=>{SetTitle(2)}}>글제목2</button>
+
+
+
+  {/* input에 뭔가 입력시 코드 실행하고 싶으면 onChange/onInput  
+      (e)_ 이벤트 객체/ input 에 입력한 값 가져오기 위해 사용 */}
+  <input onChange={(e)=>{ // 입력시_ 실행되는 부분
+    입력값변경(e.target.value); // input 창에서 입력한 이벤트.값을 콘솔창에서 보여줌.
+    // 입력값 = e.target.value 가 저장됨.
+    //user가 입력할때마다 입력값에 e.target.value 값이 저장
+ }} />
+
+    <button onClick={()=>{
+      const copy3 = [...글제목]; //array 형식은 원본 손상되지 않게 사용하는 방법.  무조건 복사해주기.
+      // Q) copy3 맨 처음에 유저가 입력한 값 추가시키기.
+      // 위에 input onchange에서 입력값 변경 확인! 
+      copy3.unshift(입력값); // unshift: 맨앞에 있는 array에 작성한 글 넣기.
+      글제목변경(copy3);
+}}> 추가 
+    </button>
+  
+  
+  
    {
      modal==true ? <Modal title={title} 글제목 ={글제목}/> : null
    }
